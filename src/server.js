@@ -22,8 +22,10 @@ const app = express();
 
 
 
-// Middleware
-app.use(cors()); 
+app.use(cors({
+  origin: "https://library-management-frontend-puce-three.vercel.app"
+ 
+})); 
 app.use(express.json());
 
 // MongoDB Connection
