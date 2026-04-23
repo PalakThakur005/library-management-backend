@@ -39,7 +39,16 @@ book: {
   type: String,
   enum: ["active", "inactive"],
   default: "active"
-}   
+}  ,
+profileImage: {
+  type: String,
+  default: "",
+},
+  phone: {
+    type: String,
+    trim: true,
+    match: [/^\+?[1-9]\d{9,14}$/, "Invalid phone number"],
+  }, 
 },
 {timestamps:true}
 );

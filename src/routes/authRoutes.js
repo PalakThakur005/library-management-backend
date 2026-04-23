@@ -4,6 +4,10 @@ import {registerUser,loginUser, getUser,getDashboardStats ,
      contactAdmin, pagination , getMe} from "../controllers/authController.js"
 import {protect} from "../middlewares/authMiddleware.js"    
 import { authorizeRoles } from "../middlewares/roleMiddleware.js"; 
+import upload from "../middlewares/upload.js";
+import { uploadProfileImage , removeProfileImage ,updateProfile} from "../controllers/authController.js";
+
+
 
 const router = express.Router()
 
@@ -74,6 +78,23 @@ router.put(
 
 router.post("/contact-admin" , contactAdmin);
 
-router.get("/me", protect, getMe);
+router.get("/me", protect , getMe);
+
+
+router.put(
+  "/upload-profile",
+  protect,
+  upload.single("image"),
+  uploadProfileImage
+);
+
+
+router.put("/remove-profile", 
+  protect,
+   removeProfileImage);
+
+router.put("/update-profile",
+     protect,
+      updateProfile);
 
 export default router;

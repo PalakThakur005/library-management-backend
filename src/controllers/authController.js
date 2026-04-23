@@ -5,14 +5,15 @@ import generatePassword from "../utils/generatePassword.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { registerEmail, resetPassword , ContactAdmin ,
   userUpdatedEmail  } from "../services/mail.js";
-  import { Department } from "../models/department.js";
+import { Department } from "../models/department.js";
+
 
 
 // REGISTER USER
 export const registerUser = async (req, res) => {
   try {
 
-    const { name, email, role ,department } = req.body;
+    const { name, email, role ,department , phone } = req.body;
 
 
 
@@ -22,11 +23,9 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // 1️⃣ Generate password
     const plainPassword = generatePassword(10);
     console.log("Generated Password:", plainPassword);
 
-    // 2️⃣ Hash password
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const userExists = await User.findOne({ email });
@@ -41,15 +40,12 @@ export const registerUser = async (req, res) => {
     const user = await User.create({
       name,
       email,
+      phone,
       department,
       password: hashedPassword,
       role: role || "student",
       status: "active"
     });
-
-
-
-    // 4️⃣ Send email
 
     const loginHtml = registerEmail(
       user.name.toUpperCase(),
@@ -74,6 +70,7 @@ return res.status(201).json({
     name: user.name,
     email: user.email,
     role: user.role,
+    phone: user.phone,
     department: user.department
   }      
   });
@@ -239,7 +236,6 @@ export const updateUser = async (req, res) => {
 
     await existingUser.save();
 
-    //  SEND EMAIL
     try {
       await sendEmail({
         to: existingUser.email,
@@ -308,10 +304,8 @@ export const resetUserPassword = async (req, res) => {
       return res.status(404).json({message:"Account is inactive. Reset password not allowed."})
     }
 
-    // 1️⃣ Generate new password
     const newPassword = generatePassword(10);
 
-    // 2️⃣ Hash password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     user.password = hashedPassword;
@@ -324,7 +318,6 @@ export const resetUserPassword = async (req, res) => {
       newPassword
     );
 
-    // 3️⃣ Send email
     await sendEmail({
       to: user.email,
       subject: "Your Password Has Been Reset",
@@ -393,7 +386,9 @@ export const pagination = async (req, res) => {
     const role = req.query.role;
     const search = req.query.search || "";
 
-    let filter = {};
+    let filter = {
+  role: { $ne: "admin" }  
+};
 
    
     if (role && role !== "all") {
@@ -453,5 +448,94 @@ export const getMe = async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+import cloudinary from "../config/cloudinary.js";
+
+export const uploadProfileImage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    
+    const allowedFormats = ["image/jpeg", "image/png", "image/jpg"];
+
+if (!allowedFormats.includes(req.file.mimetype)) {
+  return res.status(400).json({
+    message: "Invalid file type. Only JPG, JPEG, PNG allowed",
+  });
+} 
+
+    const b64 = Buffer.from(req.file.buffer).toString("base64");
+    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: "profile_images",
+     allowed_formats: ["jpg", "png", "jpeg"],
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profileImage: result.secure_url },
+      { new: true }
+    );
+
+    res.status(200).json(updatedUser);
+
+  } catch (error) {
+    console.log("UPLOAD ERROR:", error);
+    res.status(500).json({  message: "Upload failed. Please upload a valid image file"});
+  }
+};
+
+
+
+export const removeProfileImage = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    user.profileImage = ""; // remove image
+    await user.save();
+
+    res.json({
+      message: "Profile image removed",
+      user
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const { name ,phone } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name: name?.trim(), 
+       phone: phone?.trim() },
+      { new: true }
+    ).select("-password");
+
+    await user.save();
+
+    res.status(200).json({
+  success: true,
+  user
+});
+
+console.log(user)
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };

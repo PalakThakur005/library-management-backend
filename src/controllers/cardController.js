@@ -33,9 +33,9 @@ export const issueCard = async (req, res) => {
 );
 
 const prefix = user.role === "teacher" ? "FAC" : "STU";
-const year = new Date().getFullYear(); 
+const year = String(new Date().getFullYear()).trim();
 
-const cardNumber = `${prefix}- ${year}-${String(counter.seq).padStart(3, "0")}`;
+const cardNumber = `${prefix}-${year}-${String(counter.seq).padStart(3, "0")}`;
 
 
     const issue = new Date();

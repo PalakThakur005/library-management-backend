@@ -175,7 +175,6 @@ export const getDashboardStats=async(req,res)=>{
     const inactiveDepartment = await Department.countDocuments({
       status: "inactive"
     });
-console.log(activeDepartment,inactiveDepartment,totalCount,"===dept")
     return res.json({
       total: totalCount,
       active: activeDepartment,
