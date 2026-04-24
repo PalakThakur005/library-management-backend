@@ -23,18 +23,14 @@ const app = express();
 
 
 app.use(cors({
-  origin: "https://library-management-frontend-puce-three.vercel.app"
- 
+  origin: "https://library-management-frontend-puce-three.vercel.app/", 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 })); 
 app.use(express.json());
 
-// MongoDB Connection
-// mongoose.connect(process.env.MONGO_URL)
-//   .then(() => console.log("MongoDB Connected ✅"))
-//   .catch((err) => console.log("DB Error:", err));
 connectDb();
 
-// Test Route
 app.get("/", (req, res) => {
   res.send("Server Running 🚀");
 });
@@ -48,8 +44,8 @@ app.use("/api/issue", issueRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/mybooks", myissuebook);
 
-// Start Server
 
+// Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

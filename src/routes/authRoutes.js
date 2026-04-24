@@ -1,7 +1,8 @@
 import express from "express"
 import {registerUser,loginUser, getUser,getDashboardStats , 
      deleteUser, updateUser , toggleStatus, resetUserPassword, 
-     contactAdmin, pagination , getMe} from "../controllers/authController.js"
+     contactAdmin, pagination , getMe,
+     tokenVerify} from "../controllers/authController.js"
 import {protect} from "../middlewares/authMiddleware.js"    
 import { authorizeRoles } from "../middlewares/roleMiddleware.js"; 
 import upload from "../middlewares/upload.js";
@@ -10,6 +11,11 @@ import { uploadProfileImage , removeProfileImage ,updateProfile} from "../contro
 
 
 const router = express.Router()
+
+router.get(
+  "/tokenVerify",
+  tokenVerify
+);
 
 router.post(
   "/register",

@@ -437,6 +437,21 @@ if (search) {
 };
 
 
+// Token verification
+
+export const tokenVerify=async(req,res)=>{
+  const token =req.headers.authorization.split(" ")[1]
+try{
+  jwt.verify(token,process.env.JWT_SECRET)
+  res.json({valid:true})
+}
+catch(error){
+  res.json({valid:false})
+}
+}
+
+
+
 //token get me 
 
 export const getMe = async (req, res) => {
