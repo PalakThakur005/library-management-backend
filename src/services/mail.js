@@ -1,5 +1,5 @@
 export const resetPassword = (name, email, newPassword) => {
-      const loginUrl = "http://localhost:5173/login";
+      const loginUrl = "https://library-management-frontend-puce-three.vercel.app/login";
 
   return `
 <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;">

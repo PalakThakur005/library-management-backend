@@ -18,7 +18,6 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Allowed frontend origins
 const allowedOrigins = [
   "https://library-management-frontend-puce-three.vercel.app"
 ];
@@ -26,7 +25,6 @@ const allowedOrigins = [
 // ✅ CORS config
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow Postman / server-to-server requests (no origin)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -40,7 +38,6 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Handle preflight OPTIONS - Express 5 compatible syntax
 app.options("/{*path}", cors());
 
 // Middleware

@@ -43,7 +43,7 @@ export const registerUser = async (req, res) => {
       phone,
       department,
       password: hashedPassword,
-      role: role || "student",
+      role:"student",
       status: "active"
     });
 
@@ -135,9 +135,10 @@ export const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role || "admin"
+        role: user.role
       }
     });
+    console.log(role)
 
   } catch (error) {
 
@@ -154,6 +155,7 @@ export const loginUser = async (req, res) => {
 export const getDashboardStats=async(req,res)=>{
   try{
    const totalCount=await User.countDocuments({role:{$ne:"admin"}});
+   
     const studentCount=await User.countDocuments({role:"student"})
      const teacherCount=await User.countDocuments({role:"teacher"})
      const activeUsers = await User.countDocuments({
