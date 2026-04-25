@@ -9,7 +9,7 @@ export const resetPassword = (name, email, newPassword) => {
 
       <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -57,7 +57,7 @@ export const resetPassword = (name, email, newPassword) => {
              style="
                display:inline-block;
                padding:12px 20px;
-               background:#3b82f6;
+               background: #2d6c93;
                color:white;
                text-decoration:none;
                border-radius:8px;
@@ -104,7 +104,7 @@ export const registerEmail = (name, email, plainPassword) => {
 
     <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -134,7 +134,7 @@ export const registerEmail = (name, email, plainPassword) => {
              style="
                display:inline-block;
                padding:12px 20px;
-               background:#3b82f6;
+                 background: #2d6c93;
                color:white;
                text-decoration:none;
                border-radius:8px;
@@ -179,7 +179,7 @@ export const userUpdatedEmail = (name, email, role, department) => {
       
      <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -273,7 +273,7 @@ export const ContactAdmin = (name, email, message) => {
 
      <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -342,7 +342,7 @@ export const cardIssuedEmail = (name, cardNumber, issueDate, expiryDate) => {
 
      <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -433,7 +433,7 @@ export const cardExpiryUpdatedEmail = (name, cardNumber, expiry, newExpiry) => {
 
       <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -535,7 +535,7 @@ export const issuedBookEmail = (user, book, issue) => {
 
        <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -631,7 +631,7 @@ export const bookReturnedEmail = (name, bookTitle, returnDate, fine) => {
 
        <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -741,7 +741,7 @@ export const issueUpdatedEmail = (name, bookTitle, oldReturnDate, newReturnDate)
 
         <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;
@@ -828,7 +828,7 @@ export const departmentAddedEmail = (name, code, location, description) => {
 
           <!-- HEADER -->
       <div style="
-        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
+        background: linear-gradient(to right, #2d6c93, #1e5272);
         padding:25px;
         text-align:center;
         color:white;

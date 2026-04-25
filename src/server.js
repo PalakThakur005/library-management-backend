@@ -18,30 +18,28 @@ dotenv.config();
 
 const app = express();
 
-// const allowedOrigins = [
-//   "https://library-management-frontend-puce-three.vercel.app"
-// ];
+const allowedOrigins = [
+  "https://library-management-frontend-puce-three.vercel.app"
+];
 
-// // ✅ CORS config
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     if (!origin) return callback(null, true);
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
 
-//     if (allowedOrigins.includes(origin)) {
-//       return callback(null, true);
-//     } else {
-//       return callback(new Error(`CORS blocked for origin: ${origin}`));
-//     }
-//   },
-//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-//   credentials: true
-// }));
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 
-// app.options("/{*path}", cors());
+app.options("/{*path}", cors());
 
 // Middleware
-app.use(cors())
 app.use(express.json());
 
 // DB
