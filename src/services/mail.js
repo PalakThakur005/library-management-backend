@@ -9,7 +9,7 @@ export const resetPassword = (name, email, newPassword) => {
 
       <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -97,14 +97,14 @@ export const resetPassword = (name, email, newPassword) => {
 
 
 export const registerEmail = (name, email, plainPassword) => {
-    const loginUrl = "http://localhost:5173/login";
+      const loginUrl = "https://library-management-frontend-puce-three.vercel.app/login";
  return   `
 <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;">
     <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.08);">
 
     <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -179,7 +179,7 @@ export const userUpdatedEmail = (name, email, role, department) => {
       
      <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -273,7 +273,7 @@ export const ContactAdmin = (name, email, message) => {
 
      <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -342,7 +342,7 @@ export const cardIssuedEmail = (name, cardNumber, issueDate, expiryDate) => {
 
      <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -433,7 +433,7 @@ export const cardExpiryUpdatedEmail = (name, cardNumber, expiry, newExpiry) => {
 
       <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -535,7 +535,7 @@ export const issuedBookEmail = (user, book, issue) => {
 
        <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -631,7 +631,7 @@ export const bookReturnedEmail = (name, bookTitle, returnDate, fine) => {
 
        <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -741,7 +741,7 @@ export const issueUpdatedEmail = (name, bookTitle, oldReturnDate, newReturnDate)
 
         <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
@@ -828,7 +828,7 @@ export const departmentAddedEmail = (name, code, location, description) => {
 
           <!-- HEADER -->
       <div style="
-        background: linear-gradient(135deg,#6366f1,#3b82f6,#06b6d4);
+        background: bg-gradient-to-r from-[#2d6c93] to-[#1e5272];
         padding:25px;
         text-align:center;
         color:white;
