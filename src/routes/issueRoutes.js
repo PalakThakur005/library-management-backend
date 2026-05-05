@@ -16,7 +16,6 @@ import { authorizeRoles } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-// ✅ ADMIN ONLY
 
 router.post(
   "/issue-book",

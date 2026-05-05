@@ -9,36 +9,23 @@ import { issuedBookEmail, bookReturnedEmail, issueUpdatedEmail } from "../servic
 export const calculateFine = (issue, today = new Date()) => {
   if (!issue.returnDate) return 0;
 
-  if (issue.status === "returned") {
+  if (issue.status === "returned" || issue.fineClearedAt) {
     return issue.fine || 0;
   }
 
   const currentDate = new Date(today);
   currentDate.setHours(0, 0, 0, 0);
 
-  if (!issue.fineClearedAt) {
-    const dueDate = new Date(issue.returnDate);
-    dueDate.setHours(0, 0, 0, 0);
+  const dueDate = new Date(issue.returnDate);
+  dueDate.setHours(0, 0, 0, 0);
 
-    if (currentDate <= dueDate) return 0;
+  if (currentDate <= dueDate) return 0;
 
-    const overdueDays = Math.floor(
-      (currentDate - dueDate) / (1000 * 60 * 60 * 24)
-    );
-
-    return overdueDays * 10;
-  }
-
-  const clearDate = new Date(issue.fineClearedAt);
-  clearDate.setHours(0, 0, 0, 0);
-
-  if (currentDate <= clearDate) return 0;
-
-  const newLateDays = Math.floor(
-    (currentDate - clearDate) / (1000 * 60 * 60 * 24)
+  const overdueDays = Math.floor(
+    (currentDate - dueDate) / (1000 * 60 * 60 * 24)
   );
 
-  return newLateDays * 10;
+  return overdueDays * 10;
 };
 
 // ================= ISSUE BOOK =================
@@ -183,7 +170,7 @@ export const clearFine = async (req, res) => {
       });
     }
 
-    issue.fine = pendingFine;
+    issue.fine = 0;
     issue.fineClearedAt = new Date();
 
     await issue.save();
@@ -228,7 +215,8 @@ export const returnBook = async (req, res) => {
         pendingFine,
       });
     }
-
+    
+    issue.fine = pendingFine; 
     issue.status = "returned";
     await issue.save();
 
@@ -328,64 +316,31 @@ export const getIssuedBooks = async (req, res) => {
 
       {
         $addFields: {
-          fine: {
-            $cond: [
-              { $eq: ["$status", "returned"] },
-              { $ifNull: ["$fine", 0] },
+fine: {
+  $cond: [
+    {
+      $or: [
+        { $eq: ["$status", "returned"] },
+        { $ifNull: ["$fineClearedAt", false] }
+      ]
+    },
+    "$fine",
 
-              {
-                $cond: [
-                  {
-                    $gt: [
-                      {
-                        $cond: [
-                          { $ifNull: ["$fineClearedAt", false] },
-                          {
-                            $divide: [
-                              { $subtract: [new Date(), "$fineClearedAt"] },
-                              1000 * 60 * 60 * 24
-                            ]
-                          },
-                          {
-                            $divide: [
-                              { $subtract: [new Date(), "$returnDate"] },
-                              1000 * 60 * 60 * 24
-                            ]
-                          }
-                        ]
-                      },
-                      0
-                    ]
-                  },
-                  {
-                    $multiply: [
-                      {
-                        $floor: {
-                          $cond: [
-                            { $ifNull: ["$fineClearedAt", false] },
-                            {
-                              $divide: [
-                                { $subtract: [new Date(), "$fineClearedAt"] },
-                                1000 * 60 * 60 * 24
-                              ]
-                            },
-                            {
-                              $divide: [
-                                { $subtract: [new Date(), "$returnDate"] },
-                                1000 * 60 * 60 * 24
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      10
-                    ]
-                  },
-                  0
-                ]
-              }
+    {
+      $multiply: [
+        {
+          $floor: {
+            $divide: [
+              { $subtract: [new Date(), "$returnDate"] },
+              1000 * 60 * 60 * 24
             ]
           }
+        },
+        10
+      ]
+    }
+  ]
+}
         }
       },
 
