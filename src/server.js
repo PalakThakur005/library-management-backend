@@ -12,7 +12,7 @@ import departmentRoutes from "./routes/deparmentRoutes.js";
 import issueRoutes from "./routes/issueRoutes.js";
 import "./cron/remainder.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
-import myissuebook from "./routes/users/myissuebook.js";
+import myDataRoutes from "./routes/users/myDataRoutes.js";
 
 dotenv.config();
 
@@ -40,12 +40,11 @@ app.use(cors({
 app.options("/{*path}", cors());
 
 // Middleware
+// app.use(cors())
 app.use(express.json());
 
-// DB
 connectDb();
 
-// Routes
 app.get("/", (req, res) => {
   res.send("Server Running 🚀");
 });
@@ -56,7 +55,7 @@ app.use("/api/card", cardRoutes);
 app.use("/api/dept", departmentRoutes);
 app.use("/api/issue", issueRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/mybooks", myissuebook);
+app.use("/api/mybooks", myDataRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

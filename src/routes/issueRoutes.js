@@ -6,7 +6,9 @@ import {
   updateIssue,
   getIssue,
   getIssueStats,
-  getMyIssuedBooks
+  getMyIssuedBooks,
+  clearFine,
+  getFinedBooks,
 } from "../controllers/issueController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
@@ -22,6 +24,7 @@ router.post(
   authorizeRoles("admin"),
   issueBook
 );
+
 
 router.get(
   "/issued-books",
@@ -58,6 +61,17 @@ router.get(
   getIssueStats
 );
 
+router.get("/fined-books",
+   protect,
+  authorizeRoles("admin"),
+   getFinedBooks);
+
+
+
+router.put("/clear-fine/:id",
+   protect,
+  authorizeRoles("admin"),
+   clearFine);
 
 
 export default router;

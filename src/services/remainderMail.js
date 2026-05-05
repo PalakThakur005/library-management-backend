@@ -1,5 +1,5 @@
 
-export const bookReminderEmail = (name, bookTitle, dueDate) => {
+export const bookReminderEmail = (name, bookTitle, returnDate) => {
   return `
   <div style="font-family:Arial;background:#f4f6f8;padding:20px;">
 
@@ -21,7 +21,7 @@ export const bookReminderEmail = (name, bookTitle, dueDate) => {
 
         <div style="margin-top:15px;padding:15px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;">
           <p style="margin:6px 0;">📖 <b>Book:</b> ${bookTitle}</p>
-          <p style="margin:6px 0;">📅 <b>Due Date:</b> ${new Date(dueDate).toDateString()}</p>
+          <p style="margin:6px 0;">📅 <b>Due Date:</b> ${new Date(returnDate).toDateString()}</p>
         </div>
 
         <p style="margin-top:15px;color:#dc2626;font-size:13px;">

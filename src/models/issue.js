@@ -35,6 +35,10 @@ const issueSchema = new mongoose.Schema({
      type: Boolean, 
      default: false
      },
+     fineClearedAt: {
+  type: Date,
+  default: null
+},
 }, {timestamps:true});
 
 export const Issue = mongoose.model("Issue", issueSchema);

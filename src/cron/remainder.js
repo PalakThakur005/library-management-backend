@@ -9,50 +9,60 @@ import {
 cron.schedule("0 9 * * *", async () => {
   console.log("⏰ Reminder Cron Running");
 
-  
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  const today = new Date();
-  const reminderDate = new Date();
-  reminderDate.setDate(today.getDate() + 2);
+    const reminderDate = new Date(today);
+    reminderDate.setDate(today.getDate() + 2);
+    reminderDate.setHours(23, 59, 59, 999);
 
-  const issues = await Issue.find({
-    status: "issued",
-    reminderSent: false,
-    dueDate: { $gte: today, $lte: reminderDate },
-  }).populate("user book");
+    // ✅ 1. Reminder emails
+    const issues = await Issue.find({
+      status: "issued",
+      reminderSent: false,
+      returnDate: { $gte: today, $lte: reminderDate },
+    }).populate("user book");
 
-  for (let issue of issues) {
-    await sendEmail({
-      to: issue.user.email,
-      subject: "📚 Book Return Reminder",
-      html: bookReminderEmail(
-        issue.user.name,
-        issue.book.title,
-        issue.dueDate
-      ),
-    });
+    for (let issue of issues) {
+      await sendEmail({
+        to: issue.user.email,
+        subject: "📚 Book Return Reminder",
+        html: bookReminderEmail(
+          issue.user.name,
+          issue.book.title,
+          issue.returnDate
+        ),
+      });
 
-    issue.reminderSent = true;
-    await issue.save();
+      issue.reminderSent = true;
+      await issue.save();
+    }
+
+    // ❗ 2. Overdue emails (FIXED - prevent spam)
+    const overdue = await Issue.find({
+      status: "issued",
+      overdueNotified: { $ne: true },
+      returnDate: { $lt: today },
+    }).populate("user book");
+
+    for (let issue of overdue) {
+      await sendEmail({
+        to: issue.user.email,
+        subject: "⚠️ Overdue Book Alert",
+        html: overdueBookEmail(
+          issue.user.name,
+          issue.book.title,
+          issue.returnDate
+        ),
+      });
+
+      issue.overdueNotified = true;
+      await issue.save();
+    }
+
+    console.log("✅ Reminder + Overdue emails sent");
+  } catch (error) {
+    console.error("❌ Cron Error:", error.message);
   }
-
-  const overdue = await Issue.find({
-    status: "issued",
-    dueDate: { $lt: today },
-  }).populate("user book");
-
-  for (let issue of overdue) {
-    await sendEmail({
-      to: issue.user.email,
-      subject: "⚠️ Overdue Book Alert",
-      html: overdueBookEmail(
-        issue.user.name,
-        issue.book.title
-      ),
-    });
-  }
-
-
-  
-  console.log("✅ Reminder + Overdue emails sent");
 });
