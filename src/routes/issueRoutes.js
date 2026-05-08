@@ -6,7 +6,6 @@ import {
   updateIssue,
   getIssue,
   getIssueStats,
-  getMyIssuedBooks,
   clearFine,
   getFinedBooks,
 } from "../controllers/issueController.js";

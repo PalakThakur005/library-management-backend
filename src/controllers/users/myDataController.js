@@ -121,7 +121,7 @@ export const getMyFineBooks = async (req, res) => {
 
     const today = new Date();
 
-    const issues = await Issue.find({})
+    const issues = await Issue.find({user: req.user.id})
       .populate("book", "title author isbn")
       .populate("user", "name email")
       .sort({ createdAt: -1 });

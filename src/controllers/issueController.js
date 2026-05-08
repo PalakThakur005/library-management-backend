@@ -9,12 +9,24 @@ import { issuedBookEmail, bookReturnedEmail, issueUpdatedEmail } from "../servic
 export const calculateFine = (issue, today = new Date()) => {
   if (!issue.returnDate) return 0;
 
-  if (issue.status === "returned" || issue.fineClearedAt) {
-    return issue.fine || 0;
-  }
+  if (issue.status === "returned") return issue.fine || 0;
 
   const currentDate = new Date(today);
   currentDate.setHours(0, 0, 0, 0);
+
+  if (issue.fineClearedAt) {
+    const nextDayAfterClear = new Date(issue.fineClearedAt);
+    nextDayAfterClear.setDate(nextDayAfterClear.getDate() + 1);
+    nextDayAfterClear.setHours(0, 0, 0, 0);
+
+    if (currentDate < nextDayAfterClear) return 0; 
+
+    const overdueDays = Math.floor(
+      (currentDate - nextDayAfterClear) / (1000 * 60 * 60 * 24)
+    );
+
+    return overdueDays * 10;
+  }
 
   const dueDate = new Date(issue.returnDate);
   dueDate.setHours(0, 0, 0, 0);
@@ -316,31 +328,43 @@ export const getIssuedBooks = async (req, res) => {
 
       {
         $addFields: {
-fine: {
-  $cond: [
-    {
-      $or: [
-        { $eq: ["$status", "returned"] },
-        { $ifNull: ["$fineClearedAt", false] }
-      ]
-    },
-    "$fine",
-
-    {
-      $multiply: [
-        {
-          $floor: {
-            $divide: [
-              { $subtract: [new Date(), "$returnDate"] },
-              1000 * 60 * 60 * 24
-            ]
-          }
-        },
-        10
-      ]
-    }
-  ]
-}
+ fine: {
+        $cond: [
+          { $eq: ["$status", "returned"] },
+          "$fine",
+          {
+            $cond: [
+              { $ifNull: ["$fineClearedAt", false] },
+              {
+                $multiply: [
+                  {
+                    $floor: {
+                      $divide: [
+                        { $subtract: [new Date(), "$fineClearedAt"] },
+                        1000 * 60 * 60 * 24,
+                      ],
+                    },
+                  },
+                  10,
+                ],
+              },
+              {
+                $multiply: [
+                  {
+                    $floor: {
+                      $divide: [
+                        { $subtract: [new Date(), "$returnDate"] },
+                        1000 * 60 * 60 * 24,
+                      ],
+                    },
+                  },
+                  10,
+                ],
+              },
+            ],
+          },
+        ],
+      },
         }
       },
 
@@ -518,37 +542,37 @@ export const getIssueStats = async (req, res) => {
   }
 };
 
-//   particular user see only book that issue
+ //   particular user see only book that issue
 
-export const getMyIssuedBooks = async (req, res) => {
-  try {
-    const userId = req.user.id;
+// export const getMyIssuedBooks = async (req, res) => {
+//   try {
+//     const userId = req.user.id;
 
-    const issuedBooks = await Issue.find({ user: userId })
-      .populate("book", "title author isbn")
-      .populate("user", "name email role")
-      .sort({ createdAt: -1 });
+//     const issuedBooks = await Issue.find({ user: userId })
+//       .populate("book", "title author isbn")
+//       .populate("user", "name email role")
+//       .sort({ createdAt: -1 });
 
-    const today = new Date();
+//     const today = new Date();
 
-    const updatedBooks = issuedBooks.map((item) => {
-      const fine = calculateFine(item);
+//     const updatedBooks = issuedBooks.map((item) => {
+//       const fine = calculateFine(item);
 
-      return {
-        ...item._doc,
-        fine,
-        status:
-          item.status === "issued" && fine > 0
-            ? "overdue"
-            : item.status,
-      };
-    });
-    res.status(200).json(updatedBooks);
+//       return {
+//         ...item._doc,
+//         fine,
+//         status:
+//           item.status === "issued" && fine > 0
+//             ? "overdue"
+//             : item.status,
+//       };
+//     });
+//     res.status(200).json(updatedBooks);
 
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 //fined books
 
@@ -573,100 +597,114 @@ export const getFinedBooks = async (req, res) => {
       baseMatch["user.role"] = role;
     }
 
-    const pipeline = [
-      // ================= USER =================
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      { $unwind: "$user" },
+   const pipeline = [
+  {
+    $lookup: {
+      from: "users",
+      localField: "user",
+      foreignField: "_id",
+      as: "user",
+    },
+  },
+  { $unwind: "$user" },
 
-      {
-        $lookup: {
-          from: "departments",
-          localField: "user.department",
-          foreignField: "_id",
-          as: "user.department",
-        },
-      },
-      {
-        $unwind: {
-          path: "$user.department",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+  {
+    $lookup: {
+      from: "departments",
+      localField: "user.department",
+      foreignField: "_id",
+      as: "user.department",
+    },
+  },
+  {
+    $unwind: {
+      path: "$user.department",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
 
-      // ================= BOOK =================
-      {
-        $lookup: {
-          from: "books",
-          localField: "book",
-          foreignField: "_id",
-          as: "book",
-        },
-      },
-      { $unwind: "$book" },
+  {
+    $lookup: {
+      from: "books",
+      localField: "book",
+      foreignField: "_id",
+      as: "book",
+    },
+  },
+  { $unwind: "$book" },
 
-      // ================= FINE CALCULATION =================
-      {
-        $addFields: {
-          fine: {
+  // ================= FINE CALCULATION =================
+  {
+    $addFields: {
+      fine: {
+        $cond: [
+          { $eq: ["$status", "returned"] },
+          "$fine",
+          {
             $cond: [
-              { $eq: ["$status", "returned"] },
-              "$fine",
+              { $ifNull: ["$fineClearedAt", false] },
               {
-                $cond: [
+                $multiply: [
                   {
-                    $ifNull: ["$fineClearedAt", false]
+                    $floor: {
+                      $divide: [
+                        { $subtract: [new Date(), "$fineClearedAt"] },
+                        1000 * 60 * 60 * 24,
+                      ],
+                    },
                   },
+                  10,
+                ],
+              },
+              {
+                $multiply: [
                   {
-                    $multiply: [
-                      {
-                        $floor: {
-                          $divide: [
-                            { $subtract: [new Date(), "$fineClearedAt"] },
-                            1000 * 60 * 60 * 24
-                          ]
-                        }
-                      },
-                      10
-                    ]
+                    $floor: {
+                      $divide: [
+                        { $subtract: [new Date(), "$returnDate"] },
+                        1000 * 60 * 60 * 24,
+                      ],
+                    },
                   },
-                  {
-                    $multiply: [
-                      {
-                        $floor: {
-                          $divide: [
-                            { $subtract: [new Date(), "$returnDate"] },
-                            1000 * 60 * 60 * 24
-                          ]
-                        }
-                      },
-                      10
-                    ]
-                  }
-                ]
-              }
-            ]
+                  10,
+                ],
+              },
+            ],
           },
-        },
+        ],
       },
+    },
+  },
 
-      {
-        $match: {
-          fine: { $gt: 0 },
-          ...baseMatch,
-        },
+  // ================= STATUS =================   ✅ ADD THIS
+  {
+    $addFields: {
+      status: {
+        $cond: [
+          {
+            $and: [
+              { $eq: ["$status", "issued"] },
+              { $lt: ["$returnDate", new Date()] },
+            ],
+          },
+          "overdue",
+          "$status",
+        ],
       },
+    },
+  },
 
-      { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit },
-    ];
+  {
+    $match: {
+      fine: { $gt: 0 },
+      ...baseMatch,
+    },
+  },
+
+  { $sort: { createdAt: -1 } },
+  { $skip: skip },
+  { $limit: limit },
+];
 
     const data = await Issue.aggregate(pipeline);
 
