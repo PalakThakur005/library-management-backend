@@ -19,7 +19,7 @@ dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  "https://library-management-frontend-puce-three.vercel.app"
+  "https://librasync-library-management.vercel.app"
 ];
 
 app.use(cors({
